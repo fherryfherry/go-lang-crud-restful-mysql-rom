@@ -8,8 +8,8 @@ Features :
 
 How to : 
 1. Install Go Lang
-2. Run `git mod tidy`
-3. Run `git run .`
+2. Run `go mod tidy`
+3. Run `go run .`
 4. Base path : localhost:8080
 
 Endpoint : 
