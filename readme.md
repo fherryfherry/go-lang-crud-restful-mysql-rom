@@ -4,6 +4,7 @@ Features :
 1. CRUD Restful
 2. Gin Web Framework
 3. MySQL ORM with [gorm.io](gorm.io)
+4. Model & Migration
 
 How to : 
 1. Install Go Lang

@@ -1,6 +1,5 @@
 package main
 
-
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -10,12 +9,18 @@ import (
 )
 
 type Product struct {
-	ID          uint    `json:"id"`
-	Sku         string  `json:"sku"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
+	ID          uint    `json:"id" gorm:"primaryKey;autoIncrement"`
+	Sku         string  `json:"sku" gorm:"size:255"`
+	Name        string  `json:"name" gorm:"size:255"`
+	Description string  `json:"description" gorm:"size:500"`
 	Stock       int     `json:"stock"`
 	Price       float32 `json:"price"`
+}
+
+type User struct {
+	ID    int    `json:"id" gorm:"primaryKey;autoIncrement"`
+	Name  string `json:"name" gorm:"size:255"`
+	Email string `json:"email" gorm:"size:255"`
 }
 
 func connect() *gorm.DB {
@@ -24,17 +29,24 @@ func connect() *gorm.DB {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	errs := db.AutoMigrate(&Product{}, &User{})
+	if errs != nil {
+		panic(errs.Error())
+		return nil
+	}
+
 	return db
 }
 
 func listData(c *gin.Context) {
 	db := connect()
 
-	var products[] Product
+	var products []Product
 
 	db.Find(&products)
 
-	c.JSON(200, gin.H{"status":1,"message":"ok","data":products})
+	c.JSON(200, gin.H{"status": 1, "message": "ok", "data": products})
 }
 
 func detailData(c *gin.Context) {
@@ -44,7 +56,7 @@ func detailData(c *gin.Context) {
 
 	db.First(&product, c.Param("id"))
 
-	c.JSON(200, gin.H{"status":1,"message":"ok","data":product})
+	c.JSON(200, gin.H{"status": 1, "message": "ok", "data": product})
 }
 
 func updateData(c *gin.Context) {
@@ -61,13 +73,13 @@ func updateData(c *gin.Context) {
 		product.Stock = stock
 	}
 
-	price, err := strconv.ParseFloat(c.PostForm("price"),32)
+	price, err := strconv.ParseFloat(c.PostForm("price"), 32)
 	if err == nil {
 		product.Price = float32(price)
 	}
 	db.Save(&product)
 
-	c.JSON(200, gin.H{"status":1,"message":"ok"})
+	c.JSON(200, gin.H{"status": 1, "message": "ok"})
 }
 
 func createData(c *gin.Context) {
@@ -83,13 +95,13 @@ func createData(c *gin.Context) {
 		product.Stock = stock
 	}
 
-	price, err := strconv.ParseFloat(c.PostForm("price"),32)
+	price, err := strconv.ParseFloat(c.PostForm("price"), 32)
 	if err == nil {
 		product.Price = float32(price)
 	}
 	db.Save(&product)
 
-	c.JSON(200, gin.H{"status":1,"message":"ok"})
+	c.JSON(200, gin.H{"status": 1, "message": "ok"})
 }
 
 func deleteData(c *gin.Context) {
@@ -97,7 +109,7 @@ func deleteData(c *gin.Context) {
 
 	db.Delete(&Product{}, c.PostForm("id"))
 
-	c.JSON(200, gin.H{"status":1,"message":"ok"})
+	c.JSON(200, gin.H{"status": 1, "message": "ok"})
 }
 
 func main() {
